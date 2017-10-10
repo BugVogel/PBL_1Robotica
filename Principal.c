@@ -1,5 +1,5 @@
 #pragma config(Sensor, S1, sesorLuz, sensorLightActive)
-#pragma config(Sensor, S2, sensorToque, sensorTouch)
+#pragma config(Sensor, S4, sensorToque, sensorTouch)
 
 
 int valTime100;
@@ -8,6 +8,8 @@ int linha;
 int curvas =0;
 int direct = 0;
 int states = 0;
+int toqueSensor = 0;
+
 
 int motoa = 30;
 int motob = 5;
@@ -45,6 +47,7 @@ void passo3(){
  while(linha <= 68){
   nxtDisplayCenteredTextLine(3, "%d",linha);
   linha = SensorValue[S1];
+  wait1Msec(14);
  }
  ClearTimer(T1);
  while(true){
@@ -57,15 +60,36 @@ void passo3(){
         }
         //branco
         else{
+
            motor[motorA] = motoa;
            motor[motorB] =motob;
            if(valTime100 >= 15){
-                motor[motorA] = 0;
-                motor[motorB] = 0;
-                while(true);
+
+
+                while(true){
+                    motor[motorA] =0;
+                    motor[motorB] =0;
+                    if(SensorValue[S4]){ //Apertou o botao
+
+                         motor[motorA] = -60;
+                         motor[motorB] = 60;
+                        while(linha <=  69){
+                               nxtDisplayCenteredTextLine(3, "%d",linha);
+                               linha = SensorValue[S1];
+
+                        }
+                        ClearTimer(T1);
+                        break;
+                    }
+
+                }
+
+
+
+
                }
         }
-        nxtDisplayCenteredTextLine(3, "%d",linha);
+        states = 3;
         linha = SensorValue[S1];
 }
 }

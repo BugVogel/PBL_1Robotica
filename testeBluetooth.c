@@ -6,21 +6,31 @@ task main()
 
 
 
-
-        char mensagem[1];
+        setBluetoothOn();
+        char mensagem;
         setBluetoothRawDataMode();
-        char value1[1];
-        char value2[1];
+        int value1;
+        char send1 = 't';
+        wait1Msec(50);
+
+
+        while(!bBTRawMode){
+          wait1Msec(50);
+
+        }
+
+
 
         while(true){
 
 
+         value1 = SensorValue[S1];
 
-        value1[0] = SensorValue[S1];
-        value2[0] = SensorValue[S2];
-        nxtReadRawBluetooth(&mensagem[0], 1);
+        nxtReadRawBluetooth(&mensagem, 200);
         nxtDisplayCenteredTextLine(1, "%c", mensagem);
-        nxtWriteRawBluetooth(&value1[0], 1);
+
+        nxtWriteRawBluetooth(nBTCurrentStreamIndex,&send1, 200);
+
 
 
 

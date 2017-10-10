@@ -52,18 +52,26 @@ void passo3(){
  ClearTimer(T1);
  while(true){
         valTime100 = time100[T1];
+
+
+
+
+
         //cinza
         if(linha >= 68){
           ClearTimer(T1);
            motor[motorA] = motob;
            motor[motorB] =motoa;
+           wait1Msec(50);
         }
-        //branco
-        else{
+        else if(linha<=45){ //preto
+          return;
+         }
+        else{//branco
 
            motor[motorA] = motoa;
            motor[motorB] =motob;
-           if(valTime100 >= 15){
+           if(valTime100 >= 13){
 
 
                 while(true){
@@ -71,8 +79,8 @@ void passo3(){
                     motor[motorB] =0;
                     if(SensorValue[S4]){ //Apertou o botao
 
-                         motor[motorA] = -60;
-                         motor[motorB] = 60;
+                         motor[motorA] = -30;
+                         motor[motorB] = 30;
                         while(linha <=  69){
                                nxtDisplayCenteredTextLine(3, "%d",linha);
                                linha = SensorValue[S1];
@@ -93,6 +101,17 @@ void passo3(){
         linha = SensorValue[S1];
 }
 }
+
+void passo4(){ //curva para esquerda
+
+
+
+
+
+
+
+}
+
 
 task main(){
 
@@ -126,6 +145,8 @@ task main(){
 										case 2:
 										   passo3();
 										  break;
+										case 3: passo4();
+										break;
 										default:
 										  break;
 										}

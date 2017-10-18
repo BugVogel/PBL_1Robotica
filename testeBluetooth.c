@@ -9,8 +9,11 @@ task main()
         setBluetoothOn();
         char mensagem;
         setBluetoothRawDataMode();
-        int value1;
-        char send1 = 't';
+        int value1 = 2;
+        char send1[20] = 'Teste';
+        ubyte send2[3];
+        send2[0] = 1;
+        send2[
         wait1Msec(50);
 
 
@@ -29,7 +32,7 @@ task main()
         nxtReadRawBluetooth(&mensagem, 200);
         nxtDisplayCenteredTextLine(1, "%c", mensagem);
 
-        nxtWriteRawBluetooth(nBTCurrentStreamIndex,&send1, 200);
+        nxtWriteRawBluetooth(&send1, 200);
 
 
 

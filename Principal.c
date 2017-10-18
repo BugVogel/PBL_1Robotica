@@ -10,6 +10,7 @@ int curvas =0;
 int direct = 0;
 int states = 0;
 int toqueSensor = 0;
+char ligar = 'n';
 
 
 int motoa = 30;
@@ -276,7 +277,7 @@ void passo11(){ //curva para a direita
 
 }
 
-void passo12(){
+void passo12(){// curva para a  direita
 
  motor[motorA] = -30;
  motor[motorB] = 30;
@@ -290,7 +291,7 @@ states = 12;
 
 }
 
-void passo13(){
+void passo13(){ // posiciona na base
 
 
  motor[motorA] =  60;
@@ -313,23 +314,39 @@ states = 0;
 
 task main(){
 
- nMotorEncoder[motorA] = 0;
- nMotorEncoder[motorB] = 0;
+
+
+   nMotorEncoder[motorA] = 0;
+   nMotorEncoder[motorB] = 0;
+
+   setBluetoothOn();
+   setBluetoothRawDataMode();
+    while(!bBTRawMode){ //Espera entrar no modo
+          wait1Msec(50);
+
+        }
 
     ClearTimer(T1);
     while(true){
+
+    nxtReadRawBluetooth(&ligar, 20);
+
+    if( ligar == 'y'){
+
+
      linha = SensorValue[S1];
      valTime100 = time100[T1];
      valTime1 = time1[T1];
      nxtDisplayCenteredTextLine(1,"%d",states);
      nxtDisplayCenteredTextLine(4,"%d",linha);
-     nxtDisplayCenteredTextLine(6,"%d",valTime100);
+     nxtDisplayCenteredTextLine(6,"%d",valTime1);
 
 
        // preto
        if(linha <= 45){
-               ClearTimer(T1);
-               if(states <= 11){
+
+               if(states < 11){
+                 ClearTimer(T1);
                motor[motorA] = motoa;
                motor[motorB] =motob;
                }
@@ -337,20 +354,20 @@ task main(){
                motor[motorA] = motob;
                motor[motorB] =motoa;
 
-                  if(valTime1 >= 800){
-                     passo12();
-                   }
+               if(valTime1 >= 800){
+                 passo12();
+                 ClearTimer(T1);
+                 valTime1 = time1[T1];
+               }
 
-                   if( linha >=70){
-                    passo13();
 
-                   }
+
 
                }
 
        }
        else{ //branco
-              if(states != 11){
+              if(states < 11){
                motor[motorA] = motob;
                motor[motorB] =motoa;
                wait1Msec(2);
@@ -403,5 +420,11 @@ task main(){
 										}
                  }
            }
+         }
+         else{
+
+            wait1Msec(20);
+
+          }
        }
 }

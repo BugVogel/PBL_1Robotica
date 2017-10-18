@@ -13,7 +13,7 @@ task main()
         char send1[20] = 'Teste';
         ubyte send2[3];
         send2[0] = 1;
-        send2[
+
         wait1Msec(50);
 
 

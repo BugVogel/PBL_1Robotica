@@ -11,6 +11,7 @@ int direct = 0;
 int states = 0;
 int toqueSensor = 0;
 char ligar = 'n';
+bool fezPasso12=false;
 
 
 int motoa = 30;
@@ -253,6 +254,9 @@ void passo10(){ //curva para a esquerda
    linha = SensorValue[S1];
 
  }
+
+ motor[motorA] =0;
+ motor[motorB] =0;
  ClearTimer(T1);
  states =10;
 
@@ -270,6 +274,7 @@ void passo11(){ //curva para a direita
 
  }
 
+ ClearTimer(T1);
  states =11;
 
 
@@ -286,7 +291,8 @@ void passo12(){// curva para a  direita
     linha = SensorValue[S1];
  }
 
-
+ClearTimer(T1);
+fezPasso12 = true;
 states = 12;
 
 }
@@ -304,9 +310,11 @@ void passo13(){ // posiciona na base
  }
  ClearTimer(T1);
 
-
+motor[motorA] =0;
+motor[motorB]=0;
 
 states = 0;
+ligar = 'n';
 }
 
 
@@ -338,7 +346,7 @@ task main(){
      valTime100 = time100[T1];
      valTime1 = time1[T1];
      nxtDisplayCenteredTextLine(1,"%d",states);
-     nxtDisplayCenteredTextLine(4,"%d",linha);
+
      nxtDisplayCenteredTextLine(6,"%d",valTime1);
 
 
@@ -351,15 +359,15 @@ task main(){
                motor[motorB] =motob;
                }
                else{ //vai para outra borda
+
                motor[motorA] = motob;
                motor[motorB] =motoa;
 
-               if(valTime1 >= 800){
+               if(valTime1 >= 350){
                  passo12();
                  ClearTimer(T1);
                  valTime1 = time1[T1];
                }
-
 
 
 
@@ -373,6 +381,11 @@ task main(){
                wait1Msec(2);
                }
                else{ //vai para outra borda
+
+
+                 if(!fezPasso12){
+                  ClearTimer(T1);
+                 }
                  motor[motorA] = motoa;
                  motor[motorB] =motob;
                  wait1Msec(2);
@@ -415,6 +428,8 @@ task main(){
 										case 10: passo11();
 										valTime100 = time100[T1];
 										break;
+										case 12: passo13();
+										break;
 										default:
 										  break;
 										}
@@ -422,7 +437,8 @@ task main(){
            }
          }
          else{
-
+            motor[motorA] =0;
+            motor[motorB]=0;
             wait1Msec(20);
 
           }

@@ -10,13 +10,119 @@ int curvas =0;
 int direct = 0;
 int states = 0;
 int toqueSensor = 0;
+int position[2] = {0,0};
+
 char ligar = 'n';
+bool iniciar = false;
+
 bool fezPasso12=false;
 
 
 int motoa = 30;
 int motob = 5;
 
+//----------------Tasks-----------------------------
+
+
+task comunication(){
+      setBluetoothOn();
+	    setBluetoothRawDataMode();
+	    while(!bBTRawMode){ //Espera entrar no modo
+	          wait1Msec(50);
+
+	    }
+      while(true){
+      nxtReadRawBluetooth(&ligar, 20);
+          if(ligar == 'y'){
+            iniciar = true;
+          }
+          if(ligar == 'n'){
+            motor[motorA] =0;
+            motor[motorB]=0;
+            iniciar = false;
+          }
+      }EndTimeSlice();
+}
+
+  //0 -y
+  //1 -x
+  //2 -y
+  //2 +x
+  //2 -x volta
+  //3 -y
+  //4 +x
+  //5 -y
+  //6 +x
+  //7 +y
+  //7 -x
+  //7 +x volta
+  //8 +y
+  //9 -x
+  //10 -y
+  //11-x
+  //12 +y
+
+void odometriaControl(){
+      switch (states) {
+			   case 0:
+						position[1] = position[1] - 18;
+				  break;
+				  case 1:
+						position[0] = position[0] - 18;
+					break;
+					case 2:
+					//bugado
+					break;
+					case 3:
+						position[1] = position[1] - 20;
+					break;
+					case 4:
+						position[0] = position[0] + 20;
+					break;
+					case 5:
+						position[1] = position[1] - 20;
+					break;
+					case 6:
+						position[0] = position[0] + 20;
+					break;
+					case 7:
+						//bugado
+					break;
+					case 8:
+					  position[1] = position[1] + 20;
+					break;
+					case 9:
+						position[0] = position[0] - 20;
+					break;
+					case 10:
+						position[1] = position[1] - 20;
+					break;
+					case 11:
+					  position[1] = position[1] - 20;
+					break;
+					case 12:
+						position[0] = position[0] - 20;
+					break;
+					default:
+					break;
+					}
+}
+
+
+task odometria(){
+
+   while(true)  // while Motor B is still running:
+   {
+      if(nMotorEncoder[motorB] >= 360){
+          nMotorEncoder[motorB] = 0;
+          odometriaControl();
+          nxtDisplayCenteredTextLine(3, "X:%d Y:%d", position[0],position[1]);
+      }
+   }
+}
+
+
+//----------------functions----------------------
 void resetar(){
     int temp;
     temp = motob;
@@ -28,22 +134,25 @@ void resetar(){
 
 
 void passo1(){
+    StopTask(odometria);
     motor[motorA] = -60;
     motor[motorB] =60;
     while(linha >= 45)linha = SensorValue[S1];
     resetar();
     states = 1;
     ClearTimer(T1);
+    StartTask(odometria);
 }
 
 void passo2(){
+    StopTask(odometria);
     motor[motorA] = 60;
     motor[motorB] = -60;
     while(linha >= 45)linha = SensorValue[S1];
     resetar();
     states=2;
     ClearTimer(T1);
-
+    StartTask(odometria);
 }
 
 
@@ -56,7 +165,6 @@ void passo3(){
  motor[motorA] = 40;
  motor[motorB] = -40;
  while(linha <= 69){
-  nxtDisplayCenteredTextLine(3, "GIRANDO");
   linha = SensorValue[S1];
   ClearTimer(T1);
   valTime100 = time100[T1];
@@ -87,7 +195,6 @@ void passo3(){
           motor[motorB] = -60;
           linha = SensorValue[S1];
               while(linha >= 45){
-             nxtDisplayCenteredTextLine(3, "FIM");
                linha = SensorValue[S1];
                }
                ClearTimer(T1);
@@ -110,7 +217,6 @@ void passo3(){
                          motor[motorA] = 50;
                          motor[motorB] =-50;
                         while(linha <=  69){
-                               nxtDisplayCenteredTextLine(3, "%d",linha);
                                linha = SensorValue[S1];
 
                         }
@@ -132,7 +238,7 @@ void passo3(){
 
 void passo4(){ //curva para esquerda
 
-
+ StopTask(odometria);
  motor[motorA] = 60;
  motor[motorB] = -60;
  linha = SensorValue[S1];
@@ -142,20 +248,19 @@ void passo4(){ //curva para esquerda
    wait1Msec(5);
    ClearTimer(T1);
    valTime100 = time100[T1];
+
  }
-
-
 
 ClearTimer(T1);
 states =4;
 
-
+StartTask(odometria);
 }
 
 
 void passo5(){ //curva para a direita
 
-
+ StopTask(odometria);
  motor[motorA] = -20;
  motor[motorB] =  60;
  linha = SensorValue[S1];
@@ -168,12 +273,12 @@ void passo5(){ //curva para a direita
  ClearTimer(T1);
  states =5;
 
-
+StartTask(odometria);
 }
 
 void passo6(){//curva para a esquerda
 
-
+StopTask(odometria);
 motor[motorA] =  60;
 motor[motorB] = -60;
  linha = SensorValue[S1];
@@ -186,12 +291,12 @@ motor[motorB] = -60;
  states =6;
  ClearTimer(T1);
 
-
+StartTask(odometria);
 }
 
 void passo7(){//curva para a esquerda
 
-
+StopTask(odometria);
 motor[motorA] =  60;
 motor[motorB] = -60;
  linha = SensorValue[S1];
@@ -204,7 +309,7 @@ motor[motorB] = -60;
  states =7;
  ClearTimer(T1);
 
-
+StartTask(odometria);
 }
 
 
@@ -226,7 +331,7 @@ void passo8(){
 
 void passo9(){ //curva para a esquerda
 
-
+ StopTask(odometria);
  motor[motorA] =  60;
  motor[motorB] = -60;
  linha = SensorValue[S1];
@@ -240,12 +345,12 @@ void passo9(){ //curva para a esquerda
 
 
 
-
+StartTask(odometria);
 }
 
 void passo10(){ //curva para a esquerda
 
-
+ StopTask(odometria);
  motor[motorA] =  60;
  motor[motorB] = -60;
  linha = SensorValue[S1];
@@ -260,11 +365,11 @@ void passo10(){ //curva para a esquerda
  ClearTimer(T1);
  states =10;
 
-
+StartTask(odometria);
 }
 
 void passo11(){ //curva para a direita
-
+ StopTask(odometria);
  motor[motorA] = -60;
  motor[motorB] = 60;
  linha = SensorValue[S1];
@@ -279,11 +384,11 @@ void passo11(){ //curva para a direita
 
 
 
-
+StartTask(odometria);
 }
 
 void passo12(){// curva para a  direita
-
+ StopTask(odometria);
  motor[motorA] = -30;
  motor[motorB] = 30;
  while(linha <=45){
@@ -294,12 +399,12 @@ void passo12(){// curva para a  direita
 ClearTimer(T1);
 fezPasso12 = true;
 states = 12;
-
+StartTask(odometria);
 }
 
 void passo13(){ // posiciona na base
 
-
+ StopTask(odometria);
  motor[motorA] =  60;
  motor[motorB] = -60;
  linha = SensorValue[S1];
@@ -314,7 +419,8 @@ motor[motorA] =0;
 motor[motorB]=0;
 
 states = 0;
-ligar = 'n';
+iniciar = false;
+StartTask(odometria);
 }
 
 
@@ -322,33 +428,20 @@ ligar = 'n';
 
 task main(){
 
-
-
+//------------inica as taks------------------
+   StartTask(comunication);
+   StartTask(odometria);
    nMotorEncoder[motorA] = 0;
    nMotorEncoder[motorB] = 0;
 
-   setBluetoothOn();
-   setBluetoothRawDataMode();
-    while(!bBTRawMode){ //Espera entrar no modo
-          wait1Msec(50);
 
-        }
 
     ClearTimer(T1);
     while(true){
-
-    nxtReadRawBluetooth(&ligar, 20);
-
-    if( ligar == 'y'){
-
-
+    if(iniciar){
      linha = SensorValue[S1];
      valTime100 = time100[T1];
      valTime1 = time1[T1];
-     nxtDisplayCenteredTextLine(1,"%d",states);
-
-     nxtDisplayCenteredTextLine(6,"%d",valTime1);
-
 
        // preto
        if(linha <= 45){
@@ -407,7 +500,7 @@ task main(){
 										case 3: passo4();
 										valTime100 = time100[T1];
 										break;
-										case 4; passo5();
+										case 4: passo5();
 										valTime100 = time100[T1];
 										break;
 										case 5: passo6();
@@ -436,11 +529,5 @@ task main(){
                  }
            }
          }
-         else{
-            motor[motorA] =0;
-            motor[motorB]=0;
-            wait1Msec(20);
-
-          }
        }
 }

@@ -11,7 +11,7 @@ int direct = 0;
 int states = 0;
 int toqueSensor = 0;
 int position[2] = {0,0};
-
+int branco = 70;
 char ligar = 'n';
 bool iniciar = false;
 
@@ -23,6 +23,24 @@ int motob = 5;
 
 //----------------Tasks-----------------------------
 
+
+task isPressed(){
+
+   //bluetooth ja esta ligado
+
+	    while(true){
+
+	       ubyte block = SensorValue[S4];
+
+	       nxtWriteRawBluetooth(&block,1);
+	       wait1Msec(15);
+
+	    }
+
+
+
+
+}
 
 task comunication(){
       setBluetoothOn();
@@ -158,13 +176,14 @@ void passo2(){
 
 void passo3(){
 
+
   motor[motorA] = 30;
   motor[motorB] = 30;
   wait1Msec(300);
 
  motor[motorA] = 40;
  motor[motorB] = -40;
- while(linha <= 69){
+ while(linha <= branco){
   linha = SensorValue[S1];
   ClearTimer(T1);
   valTime100 = time100[T1];
@@ -180,7 +199,7 @@ void passo3(){
 
 
         //cinza
-        if(linha >= 70){
+        if(linha >= branco){
           ClearTimer(T1);
            motor[motorA] = motob;
            motor[motorB] =motoa;
@@ -210,20 +229,45 @@ void passo3(){
 
 
                 while(true){
-                    motor[motorA] =0;
-                    motor[motorB] =0;
-                    if(SensorValue[S4]){ //Apertou o botao
 
-                         motor[motorA] = 50;
-                         motor[motorB] =-50;
-                        while(linha <=  69){
-                               linha = SensorValue[S1];
+                   if(SensorValue[S4]){ //Descarga
 
-                        }
-                        ClearTimer(T1);
-                        break;
+                           motor[motorA] =0;
+                           motor[motorB] =0;
+                        while(SensorValue[S4]); //Tirar carga
+                             wait1Msec(1000);
+                             motor[motorA] = 50;
+                             motor[motorB] =-50;
+                             linha = SensorValue[S1];
+                             while(linha <=  branco){
+                                   linha = SensorValue[S1];
+
+                            }
+
+                             ClearTimer(T1);
+                             break;
+
+
+
                     }
+                    else{
 
+				                    motor[motorA] =0;
+				                    motor[motorB] =0;
+				                    while(!SensorValue[S4]); //Colocar carga
+				                         wait1Msec(1000);
+				                         motor[motorA] = 50;
+				                         motor[motorB] =-50;
+				                         linha = SensorValue[S1];
+				                        while(linha <=  branco){
+				                               linha = SensorValue[S1];
+
+
+				                        }
+				                        ClearTimer(T1);
+				                        break;
+
+				                  }
                 }
 
 
@@ -405,8 +449,8 @@ StartTask(odometria);
 void passo13(){ // posiciona na base
 
  StopTask(odometria);
- motor[motorA] =  60;
- motor[motorB] = -60;
+ motor[motorA] =  30;
+ motor[motorB] = -30;
  linha = SensorValue[S1];
  while(linha >=45){
 
@@ -420,8 +464,11 @@ motor[motorB]=0;
 
 states = 0;
 iniciar = false;
+ligar = 'n';
 StartTask(odometria);
 }
+
+
 
 
 
@@ -429,8 +476,9 @@ StartTask(odometria);
 task main(){
 
 //------------inica as taks------------------
-   StartTask(comunication);
+   StartTask(comunication); //ligou bluetooth
    StartTask(odometria);
+   StartTask(isPressed);
    nMotorEncoder[motorA] = 0;
    nMotorEncoder[motorB] = 0;
 

@@ -24,22 +24,24 @@ int motob = 5;
 //----------------Tasks-----------------------------
 
 
-task isPressed(){
+task send(){
 
-   //bluetooth ja esta ligado
+	while(true){
+	  ubyte bytesEnviados[3];
 
-	    while(true){
+	  bytesEnviados[0] = position[0];
+	  bytesEnviados[1] = position[1];
 
-	       ubyte block = SensorValue[S4];
+		if(SensorValue(S4)){
+		  bytesEnviados[2] = 1;
+		}
+		else{
+		  bytesEnviados[2] = 0;
+	  }
 
-	       nxtWriteRawBluetooth(&block,1);
-	       wait1Msec(15);
-
-	    }
-
-
-
-
+	  nxtWriteRawBluetooth(bytesEnviados,3);
+	  wait1Msec(80);
+	  }
 }
 
 task comunication(){
@@ -478,7 +480,7 @@ task main(){
 //------------inica as taks------------------
    StartTask(comunication); //ligou bluetooth
    StartTask(odometria);
-   StartTask(isPressed);
+   StartTask(send);
    nMotorEncoder[motorA] = 0;
    nMotorEncoder[motorB] = 0;
 

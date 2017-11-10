@@ -1,25 +1,17 @@
-//Envia dados o tempo inteiro para o supervisorio
+//Envia dados para o supervisorio
 task enviaDados(){
 
-  ubyte bytesEnviados[9];
-  char X[3],Y[3],estado[1],envia[9];
+  ubyte bytesEnviados[3];
 
-  X = (char)position[0];
-  Y = (char)position[1];
+  bytesEnviados = position[0];
+  bytesEnviados = position[1];
 
 	if(SensorValue(S4)){
-	  estado[0] = 'c';
+	  bytesEnviados[2] = 1;
 	}
 	else{
-	  estado[0] = 'd';
+	  bytesEnviados[2] = 0;
   }
 
-  strcat(envia,X);
-  strcat(envia,"#");
-  strcat(envia,Y);
-  strcat(envia,"#");
-  strcat(envia,estado[0]);
-
-  bytesEnviados = envia;
-  nxtWriteRawBluetooth(bytesEnviados,9);
+  nxtWriteRawBluetooth(bytesEnviados,3);
 }

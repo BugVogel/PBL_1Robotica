@@ -10,8 +10,8 @@ int curvas =0;
 int direct = 0;
 int states = 0;
 int toqueSensor = 0;
-int position[2] = {0,0};
-int branco = 70;
+int position[2] = {126,126};
+int branco = 74;
 char ligar = 'n';
 bool iniciar = false;
 
@@ -63,7 +63,7 @@ task comunication(){
           }
       }EndTimeSlice();
 }
-
+//os sinais do Y sao invertidos
   //0 -y
   //1 -x
   //2 -y
@@ -85,7 +85,7 @@ task comunication(){
 void odometriaControl(){
       switch (states) {
 			   case 0:
-						position[1] = position[1] - 18;
+						position[1] = position[1] + 18;
 				  break;
 				  case 1:
 						position[0] = position[0] - 18;
@@ -94,13 +94,13 @@ void odometriaControl(){
 					//bugado
 					break;
 					case 3:
-						position[1] = position[1] - 20;
+						position[1] = position[1] + 20;
 					break;
 					case 4:
 						position[0] = position[0] + 20;
 					break;
 					case 5:
-						position[1] = position[1] - 20;
+						position[1] = position[1] + 20;
 					break;
 					case 6:
 						position[0] = position[0] + 20;
@@ -109,13 +109,13 @@ void odometriaControl(){
 						//bugado
 					break;
 					case 8:
-					  position[1] = position[1] + 20;
+					  position[1] = position[1] - 20;
 					break;
 					case 9:
 						position[0] = position[0] - 20;
 					break;
 					case 10:
-						position[1] = position[1] - 20;
+						position[1] = position[1] + 20;
 					break;
 					case 11:
 					  position[1] = position[1] - 20;
